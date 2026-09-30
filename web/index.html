@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>网球俱乐部 · 发球机预约与球筐回收</title>
+<link rel="stylesheet" href="/web/styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='44' fill='%23d9ef36'/><path d='M20 30 Q50 55 80 25 M15 55 Q50 60 85 50 M25 80 Q55 62 78 82' stroke='%23fff' stroke-width='7' fill='none'/></svg>">
+</head>
+<body>
+<header class="topbar">
+  <div class="logo"><span class="ball">🎾</span>硬地网球俱乐部 · 发球机管理台</div>
+  <div class="weather-chip" id="weatherChip">天气加载中…</div>
+  <nav class="tabs" id="tabs">
+    <button data-tab="calendar" class="active">场地日历</button>
+    <button data-tab="book">预约</button>
+    <button data-tab="equipment">设备可用表</button>
+    <button data-tab="sessions">领用 / 训练计时</button>
+    <button data-tab="returns">球筐回收</button>
+    <button data-tab="faults">故障维修</button>
+    <button data-tab="deposits">押金复核</button>
+  </nav>
+</header>
+
+<!-- 雨停提示：页面流内横幅，可关闭，不遮挡清点结果 -->
+<div id="rainBanner" class="rain-banner" hidden>
+  <span id="rainBannerText">🌧️ 雨天停场中</span>
+  <span class="actions">
+    <button class="btn small grass" id="rainResumeBtn">雨停 · 恢复场地</button>
+    <button class="btn small ghost" id="rainDismissBtn">知道了（横幅不影响下方操作）</button>
+  </span>
+</div>
+
+<main id="view"></main>
+
+<div class="toast-wrap" id="toasts"></div>
+<script src="/web/app.js"></script>
+</body>
+</html>
