@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>网球俱乐部 · 发球机预约与球筐回收</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="ball"></span>硬地网球俱乐部 · 发球机管理台</div>
+  <div class="meta">
+    <span class="weather-chip" id="weatherChip">天气 —</span>
+    <span id="clock">--:--</span>
+    <button class="btn small grass" id="btnTick">立即执行调度</button>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="calendar" class="active">场地日历</button>
+  <button data-tab="book">新建预约</button>
+  <button data-tab="orders">订单与归还</button>
+  <button data-tab="equipment">设备可用表</button>
+  <button data-tab="deductions">押金复核</button>
+  <button data-tab="incidents">故障与事件</button>
+</nav>
+
+<main>
+  <!-- ============ 日历 ============ -->
+  <section class="tabpane active" id="tab-calendar">
+    <div class="card">
+      <h2>场地日历 · 球场与发球机同一时间轴</h2>
+      <div class="sub">砖红赛道为球场，草绿赛道为发球机；同一订单在两条赛道同时出现。红色描边为检测到的时间重叠，红线为当前时刻。点击色块查看订单。</div>
+      <div class="cal-scroll"><div class="cal" id="cal"></div></div>
+      <div class="legend">
+        <span><i style="background:var(--brick)"></i>待领用</span>
+        <span><i style="background:var(--grass)"></i>进行中</span>
+        <span><i style="background:#a97c2e"></i>已归还待结单</span>
+        <span><i style="background:#2f5d8a"></i>雨停</span>
+        <span><i style="background:#b9b0a5"></i>迟到释放/取消</span>
+        <span><i style="background:#7d8f86"></i>已结单</span>
+        <span><i style="background:#fff;box-shadow:0 0 0 2.5px var(--danger)"></i>时间重叠</span>
+      </div>
+    </div>
+    <div class="card brick">
+      <h2>调度器状态</h2>
+      <div class="sub" id="schedulerInfo"></div>
+    </div>
+  </section>
+
+  <!-- ============ 新建预约 ============ -->
+  <section class="tabpane" id="tab-book">
+    <div class="grid2">
+      <div class="card brick">
+        <h2>新建预约</h2>
+        <div class="sub">确认后将在同一事务内同时锁定球场与发球机；维修中机器、雨天停场不可选。</div>
+        <div class="quick-jumps" style="justify-content:flex-start" id="demoChips">
+          <button type="button" data-demo="court">演示：撞同球场</button>
+          <button type="button" data-demo="machine">演示：撞同发球机</button>
+          <button type="button" data-demo="maintenance">演示：选维修机</button>
+        </div>
+        <form id="bookingForm">
+          <label class="field"><span>会员</span><select name="memberId" id="fMember"></select></label>
+          <div class="grid2">
+            <label class="field"><span>球场</span><select name="courtId" id="fCourt"></select></label>
+            <label class="field"><span>发球机</span><select name="machineId" id="fMachine"></select></label>
+          </div>
+          <label class="field"><span>训练模式</span><select name="modeId" id="fMode"></select></label>
+          <div class="grid2">
+            <label class="field"><span>开始</span><input type="datetime-local" name="start" id="fStart" step="1800"></label>
+            <label class="field"><span>结束</span><input type="datetime-local" name="end" id="fEnd" step="1800"></label>
+          </div>
+          <div id="conflictHint"></div>
+          <div class="kvline" style="margin:6px 0 12px">费用预估：<b id="feePreview">¥0</b> ｜ 冻结押金：<b>¥200</b></div>
+          <button class="btn" type="submit">确认预约（双重锁定）</button>
+        </form>
+      </div>
+      <div class="card">
+        <h2>设备可用表（即时）</h2>
+        <div id="bookAvailability"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 订单 ============ -->
+  <section class="tabpane" id="tab-orders">
+    <div class="card">
+      <h2>预约订单</h2>
+      <div class="sub">领用 → 训练计时 → 归还清点（电池插充）→ 押金复核 → 结单</div>
+      <div id="ordersList"></div>
+    </div>
+  </section>
+
+  <!-- ============ 设备 ============ -->
+  <section class="tabpane" id="tab-equipment">
+    <div class="card">
+      <h2>设备可用表</h2>
+      <div class="sub">充电未完成的电池与维修中的发球机不可分配。</div>
+      <h3 style="margin:8px 0;color:var(--brick-dark)">球场</h3>
+      <div class="grid3" id="availCourts"></div>
+      <h3 style="margin:16px 0 8px;color:var(--grass-dark)">发球机</h3>
+      <div class="grid3" id="availMachines"></div>
+      <h3 style="margin:16px 0 8px">电池</h3>
+      <div class="grid3" id="availBatteries"></div>
+      <h3 style="margin:16px 0 8px">球筐</h3>
+      <div class="grid3" id="availBaskets"></div>
+    </div>
+    <div class="card brick">
+      <h2>故障维修登记</h2>
+      <div id="repairList"></div>
+    </div>
+  </section>
+
+  <!-- ============ 押金复核 ============ -->
+  <section class="tabpane" id="tab-deductions">
+    <div class="card brick">
+      <h2>押金扣款复核（经理）</h2>
+      <div class="sub">扣款只能依据归还清点记录生成；同一订单同一原因幂等，仅经理可确认，重复确认不会重复扣款。</div>
+      <div id="deductionList"></div>
+    </div>
+  </section>
+
+  <!-- ============ 故障与事件 ============ -->
+  <section class="tabpane" id="tab-incidents">
+    <div class="card">
+      <h2>事件流</h2>
+      <div class="sub">卡球、电池掉电、设备刮伤、雨天停场均记录在案。</div>
+      <div id="incidentList"></div>
+    </div>
+  </section>
+</main>
+
+<!-- 订单详情/操作弹层 -->
+<div class="modal-mask" id="modalMask">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<div id="toast"></div>
+<script src="/app.js"></script>
+</body>
+</html>

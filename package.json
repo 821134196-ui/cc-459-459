@@ -1,0 +1,16 @@
+{
+  "name": "tennis-club-booking",
+  "version": "1.0.0",
+  "description": "网球俱乐部发球机预约与球筐回收系统（演示数据）",
+  "private": true,
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "reseed": "RESEED=1 node src/server.js",
+    "test": "node --test test/*.test.js"
+  }
+}
